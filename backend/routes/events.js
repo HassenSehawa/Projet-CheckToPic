@@ -10,7 +10,7 @@ const Participant = require("../models/participants");
 const Etablissement = require("../models/etablissements");
 
 const { checkBody } = require("../modules/checkBody");
-
+//test
 // Fonction pour vérifier et récupérer l'admin via son token et éviter les répétitions
 const verifyAdminToken = (token) => {
   return Admin.findOne({ token }).then((admin) => {
