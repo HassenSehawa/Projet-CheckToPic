@@ -117,63 +117,6 @@ router.post("/signin", (req, res) => {
   }
 });
 
-// Route pour rechercher un admin en particulier (à partir de son token)
-
-router.post("/findByToken", (req, res) => {
-  const fields = ["token"];
-
-  // Vérification de la présence des données
-  if (!checkBody(req.body, fields)) {
-    return res.json({ result: false, message: "Champs manquants ou vides" });
-  } else {
-    Admin.findOne({ token: req.body.token }).then((response) => {
-      if (!response) {
-        return res.json({
-          result: false,
-          message: "Aucun admin trouvé avec ce token",
-        });
-      } else {
-        return res.json({ result: true, data: response });
-      }
-    });
-  }
-});
-
-// Route pour rechercher tous les admins d'un établissement
-router.get("/findAllByEtablissement/:etablissementId", (req, res) => {
-  Admin.find({ etablissement: req.params.etablissementId }).then((data) => {
-    if (data.length === 0) {
-      return res.json({
-        result: false,
-        message: "Aucun admin sur cet établissement ou établissement inconnu",
-      });
-    } else {
-      return res.json({ result: true, data });
-    }
-  });
-});
-
-// Route pour supprimer un admin (via son ID)
-router.delete("/deleteById", (req, res) => {
-  const fields = ["adminId"];
-
-  // Vérification de la présence des données
-  if (!checkBody(req.body, fields)) {
-    return res.json({ result: false, message: "Champs manquants ou vides" });
-  } else {
-    Admin.deleteOne({ _id: req.body.adminId }).then((response) => {
-      if (response.deletedCount > 0) {
-        return res.json({ result: true, message: "Admin supprimé" });
-      } else {
-        return res.json({
-          result: false,
-          message: "Aucun admin trouvé avec cet ID",
-        });
-      }
-    });
-  }
-});
-
 // Route pour modifier les infos d'un admin (via son token)
 router.put("/updateByToken", (req, res) => {
   const mandatoryFields = ["token"];

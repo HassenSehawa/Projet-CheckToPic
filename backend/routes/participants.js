@@ -36,7 +36,7 @@ router.post("/add/", (req, res) => {
 });
 
 // GET route pour récupérer un participant
-router.get("/:id", (req, res) => {
+router.get("/:participantId", (req, res) => {
   Participant.findById(req.params.id)
     .then((participant) => {
       if (!participant) {
@@ -60,34 +60,8 @@ router.get("/findAllByEtablissement/:etablissementId", (req, res) => {
     });
 });
 
-// PUT route pour mettre à jour un participant
-router.put("/modify/:id", (req, res) => {
-  const fields = ["firstName", "lastName", "email", "phone", "birthDate"];
-  if (!checkBody(req.body, fields)) {
-    return res.json({ result: false, message: "Champs manquants ou vides" });
-  }
+// PUT route pour mettre à jour un participant = à terminer
 
-  Participant.findByIdAndUpdate(
-    req.params.id,
-    {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      phone: req.body.phone,
-      birthDate: req.body.birthDate,
-    },
-    { new: true }
-  ).then((updatedParticipant) => {
-    if (!updatedParticipant) {
-      return res.json({ result: false, message: "Participant non trouvé" });
-    }
-    res.json({
-      result: true,
-      message: "Participant mis à jour",
-      participant: updatedParticipant,
-    });
-  });
-});
 
 // DELETE route pour supprimer un participant
 router.delete("/delete/:participantId", (req, res) => {
