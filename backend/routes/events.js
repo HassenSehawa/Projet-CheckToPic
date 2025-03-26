@@ -42,7 +42,7 @@ router.post("/add/:adminId", (req, res) => {
   newEvent
     .save()
     .then(() => {
-      res.status(200).json({ response: true, message: "Évènement créé" });
+      res.status(200).json({ result: true, message: "Évènement créé" });
     })
     .catch((error) => {
       res

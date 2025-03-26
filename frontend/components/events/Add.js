@@ -5,14 +5,29 @@ import { buttonStyles } from "../modules/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import TextField from "@mui/material/TextField";
-
 import AddGroup from "./AddGroup";
-import AddDate from "./AddDate";
-
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "dayjs/locale/fr";
 
 function AddEvent() {
   // Récupérer les infos admin depuis Redux
   const admin = useSelector((state) => state.admin.value);
+
+  const [groupInEtablissement, setGroupInEtablissement] = useState([]);
+  const [dateStart, setDateStart] = useState(null);
+  const [dateEnd, setDateEnd] = useState(null);
+  const [msgCreationEvent, setMsgCreationEvent] = useState("");
+  const [isCreated, setIsCreated] = useState(false);
+
+  const handleChangeDateStart = (value) => {
+    setDateStart(value);
+  };
+
+  const handleChangeDateEnd = (value) => {
+    setDateEnd(value);
+  };
 
   // États centralisés adaptés au modèle du backend
   const [form, setForm] = useState({
@@ -24,12 +39,6 @@ function AddEvent() {
     authorisations: [],
   });
 
-  const [groupInEtablissement, setGroupInEtablissement] = useState([]);
-  const [participantInGroup, setParticipantInGroup] = useState([]);
-  const [msgCreationEvent, setMsgCreationEvent] = useState("");
-  const [isCreated, setIsCreated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
   // Fonction pour mettre à jour les valeurs du formulaire
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -37,25 +46,6 @@ function AddEvent() {
       ...prevForm,
       [name]: value,
     }));
-  };
-
-  // Format personnalisé pour AddDate qui continue d'utiliser startDate/endDate
-  const handleDateChange = (name, value) => {
-    // Mapping des noms de champs de l'UI vers le modèle backend
-    const fieldMapping = {
-      startDate: "dateStart",
-      endDate: "dateEnd",
-    };
-
-    setForm((prevForm) => ({
-      ...prevForm,
-      [fieldMapping[name] || name]: value,
-    }));
-  };
-
-  // Supprimer le participant du groupe
-  const handleRemoveParticipant = (id) => {
-    setParticipantInGroup(participantInGroup.filter((e) => e.id !== id));
   };
 
   // Supprimer un groupe
@@ -70,13 +60,9 @@ function AddEvent() {
     setForm({
       title: "",
       place: "",
-      dateStart: "",
-      dateEnd: "",
       supportsCom: [],
       authorisations: [],
     });
-    setGroupInEtablissement([]);
-    setParticipantInGroup([]);
   };
 
   // Valider les champs du formulaire
@@ -90,19 +76,22 @@ function AddEvent() {
       setMsgCreationEvent("Veuillez ajouter au moins un groupe");
       return false;
     }
-
-    if (!form.dateStart) {
+    if (!form.place) {
+      setMsgCreationEvent("Veuillez ajouter un lieu à l'évènement");
+      return false;
+    }
+    if (!dateStart) {
       setMsgCreationEvent("Veuillez définir une date de début");
       return false;
     }
 
-    if (!form.dateEnd) {
+    if (!dateEnd) {
       setMsgCreationEvent("Veuillez définir une date de fin");
       return false;
     }
 
     // Vérifier que la date de fin est après la date de début
-    if (new Date(form.dateEnd) < new Date(form.dateStart)) {
+    if (dateEnd.isBefore(dateStart)) {
       setMsgCreationEvent(
         "La date de fin doit être postérieure à la date de début"
       );
@@ -123,56 +112,30 @@ function AddEvent() {
       return;
     }
 
-    setIsLoading(true);
-
-    // Préparation des données selon le format attendu par le backend
-    const requestBody = {
-      title: form.title,
-      authorisations: [], // Un tableau non vide pour passer la validation
-      groupId: groupInEtablissement.map((group) => group.id), // Conversion de l'array d'objets en array d'IDs
-      dateStart: form.dateStart,
-      dateEnd: form.dateEnd,
-      place: form.place,
-      supportsCom: form.supportsCom,
-      etablissementId: admin.etablissement,
-    };
-
-    console.log("Envoi au serveur:", requestBody); // Pour déboguer
-
     fetch(`http://localhost:3000/events/add/${admin.infoAdmin.id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({
+        title: form.title,
+        authorisations: [], // Un tableau non vide pour passer la validation
+        groupId: groupInEtablissement.map((group) => group.id), // Conversion de l'array d'objets en array d'IDs
+        dateStart: dateStart,
+        dateEnd: dateEnd,
+        place: form.place,
+        supportsCom: form.supportsCom,
+        etablissementId: admin.etablissement,
+      }),
     })
-      .then((response) =>
-        response.json().then((data) => ({
-          ok: response.ok,
-          status: response.status,
-          data,
-        }))
-      )
-      .then(({ ok, status, data }) => {
-        if (!ok) {
-          console.error("Erreur de création:", status, data);
-          setMsgCreationEvent(
-            data.message || `Erreur ${status}: Impossible de créer l'événement`
-          );
-          setIsCreated(false);
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          setMsgCreationEvent("Événement créé avec succès!");
+          setIsCreated(true);
+          resetForm();
         } else {
-          setMsgCreationEvent(data.message || "Événement créé avec succès!");
-          setIsCreated(data.data?.result || data.result);
-
-          if (data.data?.result || data.result) {
-            resetForm();
-          }
+          setMsgCreationEvent("Impossible de créer l'événement");
+          setIsCreated(false);
         }
-      })
-      .catch((error) => {
-        console.error("Erreur réseau:", error);
-        setMsgCreationEvent("Erreur de communication avec le serveur");
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   };
 
@@ -183,15 +146,11 @@ function AddEvent() {
         <div className={styles.formButton}>
           <button
             onClick={handleSubmitEvent}
-            disabled={isLoading}
             className={buttonStyles({ color: "primary" })}
           >
-            {isLoading ? "Enregistrement en cours..." : "Enregistrer"}
+            Créer un évènement
           </button>
-          <button
-            className={buttonStyles({ color: "secondary" })}
-            disabled={!isCreated || isLoading}
-          >
+          <button className={buttonStyles({ color: "secondary" })}>
             Générer les autorisations
           </button>
         </div>
@@ -265,29 +224,31 @@ function AddEvent() {
 
             <div className={styles.formAddDate}>
               <h4>Dates de l'événement *</h4>
-              {/* Vous devez adapter le composant AddDate ou créer une interface alternative */}
-              <AddDate form={form} handleFormChange={handleFormChange} />
-            </div>
-          </div>
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="fr"
+              >
+                <DatePicker
+                  sx={{ width: 400, marginBottom: 2, marginTop: 1 }}
+                  label="Date de début"
+                  value={dateStart}
+                  onChange={handleChangeDateStart}
+                />
+              </LocalizationProvider>
 
-          <div className={styles.secondBloc}>
-            {/* <h3>Participants</h3>
-            <div className={styles.boxContainer}>
-              {participantInGroup.length === 0 ? (
-                <p className={styles.emptyState}>Aucun participant sélectionné</p>
-              ) : (
-                participantInGroup.map((participant, index) => (
-                  <p
-                    onClick={() => handleRemoveParticipant(participant.id)}
-                    className={styles.participantTag}
-                    key={index}
-                  >
-                    {participant.label}
-                    <FontAwesomeIcon icon={faXmark} className={styles.removeIcon} />
-                  </p>
-                ))
-              )}
-            </div> */}
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="fr"
+              >
+                <DatePicker
+                  sx={{ width: 400, marginBottom: 2 }}
+                  label="Date de fin"
+                  value={dateEnd}
+                  onChange={handleChangeDateEnd}
+                />
+              </LocalizationProvider>
+              {/* <AddDate form={form} handleFormChange={handleFormChange} /> */}
+            </div>
           </div>
         </div>
       </div>

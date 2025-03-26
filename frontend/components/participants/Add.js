@@ -34,16 +34,6 @@ function Add() {
     phone: "",
   });
 
-  console.log("participant form : ", formParticipant);
-  console.log(
-    "birthDateParticipant : ",
-    birthDateParticipant ? birthDateParticipant.format("DD/MM/YYYY") : null
-  );
-
-  console.log("firstGuardian : ", formFirstLegalGuardian);
-
-  console.log("formSecondLegalGuardian : ", formSecondLegalGuardian);
-
   const handleChangeParticipant = (e) => {
     const { name, value } = e.target;
     setFormParticipant((prevForm) => ({
@@ -80,7 +70,7 @@ function Add() {
         firstName: formParticipant.firstName,
         lastName: formParticipant.lastName,
         pictureUrl: "",
-        birthDate: birthDateParticipant.toDate(),
+        birthDate: birthDateParticipant,
         etablissementId: admin.etablissement,
         legalGuardian: [formFirstLegalGuardian, formSecondLegalGuardian],
       }),

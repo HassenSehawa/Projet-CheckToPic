@@ -6,6 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal, Box, Button, TextField, Typography } from "@mui/material";
 
 function Modify({ open, handleToggleModal, idGroup }) {
+
+// COPIE DU COMPOSANT MODIFY DE GROUPE - A ADAPTER
+
   //A. Redux
   const admin = useSelector((state) => state.admin.value);
 
