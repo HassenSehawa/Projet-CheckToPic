@@ -5,7 +5,7 @@ const { checkBody } = require("../modules/checkBody");
 
 
 // Route pour la création d'un nouveau participant 
-router.post("/add/", (req, res) => {
+router.post("/add", (req, res) => {
   const fields = ["firstName", "lastName", "birthDate", "legalGuardian"];
 
   // Vérification de la présence des données

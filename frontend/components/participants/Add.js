@@ -80,7 +80,7 @@ function Add() {
         firstName: formParticipant.firstName,
         lastName: formParticipant.lastName,
         pictureUrl: "",
-        birthDate: birthDateParticipant.format("DD/MM/YYYY"),
+        birthDate: birthDateParticipant.toDate(),
         etablissementId: admin.etablissement,
         legalGuardian: [formFirstLegalGuardian, formSecondLegalGuardian],
       }),

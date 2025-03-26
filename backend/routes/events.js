@@ -140,4 +140,71 @@ router.delete("/:eventId", (req, res) => {
   }
 });
 
+// AdminPage
+
+router.get("/eventsByAdminWithParticipantInfos/:token", (req, res) => {
+  // Vérifie si l'admin existe via son token
+  Admin.findOne({ token: req.params.token })
+    .then((admin) => {
+      if (!admin) {
+        return res.json({
+          result: false,
+          message: "Aucun admin trouvé avec ce token",
+        });
+      }
+
+      // Si l'admin est trouvé, récupère les événements liés à l'admin
+      return Event.find({ adminId: admin._id }).populate(
+        "authorisations.participant",
+        "pictureUrl firstName lastName -_id"
+      );
+    })
+    .then((events) => {
+      if (!events || events.length === 0) {
+        return res.status(404).json({
+          result: false,
+          message: "Aucun événement trouvé pour cet admin",
+        });
+      }
+
+      res.status(200).json({ result: true, data: events });
+    });
+});
+
+// dashboardPage
+
+
+// Route pour récupérer les autorisations d'un events via son ID
+router.post("/autorisationByEvent", (req, res) => {
+  const fields = ["eventId"];
+
+  // Vérification de la présence des données dans le body
+  if (!checkBody(req.body, fields)) {
+    return res
+      .status(400)
+      .json({ result: false, message: "Champs manquants ou vides" });
+  }
+
+  // Extraction de l'eventId du body
+  const { eventId } = req.body;
+
+  // Recherche de l'event via son ID
+  Event.findById(eventId).then((event) => {
+    if (!event) {
+      return res.status(404).json({
+        result: false,
+        message: "Aucun événement trouvé avec cet ID",
+      });
+    }
+
+    // Si l'event est trouvé, renvoyer les autorisations
+    res.status(200).json({
+      result: true,
+      data: event.authorisations, // Supposons que les autorisations sont stockées dans ce champ
+    });
+  });
+});
+
+
+
 module.exports = router;

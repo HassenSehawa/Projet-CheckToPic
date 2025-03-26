@@ -79,7 +79,7 @@ function Header({ title }) {
         >
           <MenuItem>
             {/* lien menu à ajouter ci-dessous */}
-            <Link href="/adminProfile">Mon compte </Link>
+            <Link href="/ctp-admin/adminProfile">Mon compte </Link>
           </MenuItem>
         </Menu>
       </div>

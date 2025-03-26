@@ -1,10 +1,10 @@
 import Layout from "../../../components/layout/Layout";
-import Events from "../../../components/events/Events";
+import AllEvents from "../../../components/events/AllEvents";
 
 function EventPage () {
   return (
     <Layout>
-      <Events />
+      <AllEvents />
     </Layout>
   );
 }

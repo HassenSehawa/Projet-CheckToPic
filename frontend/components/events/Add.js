@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 
 import AddGroup from "./AddGroup";
 import AddDate from "./AddDate";
-import AddCom from "./AddCom";
+
 
 function AddEvent() {
   // Récupérer les infos admin depuis Redux
@@ -289,19 +289,6 @@ function AddEvent() {
               )}
             </div> */}
           </div>
-        </div>
-
-        <div className={styles.formAddCom}>
-          <h4>Commentaires (optionnel)</h4>
-          <AddCom
-            supportsCom={form.supportsCom}
-            onComChange={(newCom) => {
-              setForm((prevForm) => ({
-                ...prevForm,
-                supportsCom: newCom,
-              }));
-            }}
-          />
         </div>
       </div>
 
