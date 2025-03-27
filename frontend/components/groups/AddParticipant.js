@@ -27,7 +27,7 @@ function AddParticipant({
   //on récupère tous les participants liés à l'établissement de l'admin
   useEffect(() => {
     fetch(
-      `http://localhost:3000/participants/findAllByEtablissement/${admin.etablissement}`
+      `http://localhost:3000/participants/findAllByEtablissement/${admin.etablissement}/${admin.token}`
     )
       .then((response) => response.json())
       .then((data) => {

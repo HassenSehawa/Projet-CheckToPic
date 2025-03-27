@@ -2,7 +2,7 @@ import styles from "../../styles/Participants.module.css";
 import { buttonStyles } from "../modules/Button";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -73,6 +73,7 @@ function Add() {
         birthDate: birthDateParticipant,
         etablissementId: admin.etablissement,
         legalGuardian: [formFirstLegalGuardian, formSecondLegalGuardian],
+        token: admin.token,
       }),
     })
       .then((response) => response.json())

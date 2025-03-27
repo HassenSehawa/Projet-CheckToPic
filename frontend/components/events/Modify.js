@@ -25,7 +25,7 @@ function Modify({ open, handleToggleModal, idGroup }) {
   // on récupère tous les participants de l'établissement
   useEffect(() => {
     fetch(
-      `http://localhost:3000/participants/findAllByEtablissement/${admin.etablissement}`
+      `http://localhost:3000/participants/findAllByEtablissement/${admin.etablissement}/${admin.token}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -83,7 +83,7 @@ function Modify({ open, handleToggleModal, idGroup }) {
   const handleSubmitChange = () => {
     const newParticipantIds = participantsInGroup.map((e) => e._id);
 
-    fetch(`http://localhost:3000/groups/modify/${idGroup}`, {
+    fetch(`http://localhost:3000/groups/modify/${idGroup}/${admin.token}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

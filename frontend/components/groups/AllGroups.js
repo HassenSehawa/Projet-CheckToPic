@@ -12,7 +12,7 @@ import "moment/locale/fr";
 function AllGroups() {
   //A. Redux
   const admin = useSelector((state) => state.admin.value);
-
+const monQ='monq'
   //B. States
   const [open, setOpen] = useState(false);
   const [idGroup, setIdGroup] = useState("");
@@ -21,7 +21,7 @@ function AllGroups() {
   //C/ Logique
   useEffect(() => {
     fetch(
-      `http://localhost:3000/groups/findAllGroupsByEtablissement/${admin.etablissement}`
+      `http://localhost:3000/groups/findAllGroupsByEtablissement/${admin.etablissement}/${admin.token}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -40,11 +40,17 @@ function AllGroups() {
   }, []);
 
   const handleDeleteGroup = (id) => {
-    fetch(`http://localhost:3000/groups/${id}`, { method: "DELETE" })
+    fetch(`http://localhost:3000/groups/${id}/${admin.token}`, { method: "DELETE" })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.message);
-        setGroupsData(groupsData.filter((e) => e.id !== id));
+        if (data.result) {
+          console.log(data.message);
+          console.log(data.result);
+          setGroupsData(groupsData.filter((e) => e.id !== id))
+        }
+        else {
+        console.log(data.message)
+        }
       });
   };
 

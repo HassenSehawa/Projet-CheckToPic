@@ -2,11 +2,17 @@ var express = require("express");
 var router = express.Router();
 const Participant = require("../models/participants");
 const { checkBody } = require("../modules/checkBody");
-
+const { checkToken } = require("../modules/checkToken");
 
 // Route pour la création d'un nouveau participant 
 router.post("/add", (req, res) => {
   const fields = ["firstName", "lastName", "birthDate", "legalGuardian"];
+
+
+  checkToken(req.body.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
+    }
 
   // Vérification de la présence des données
   if (!checkBody(req.body, fields)) {
@@ -33,7 +39,7 @@ router.post("/add", (req, res) => {
       }
     })
   
-});
+})});
 
 // GET route pour récupérer un participant
 router.get("/:participantId", (req, res) => {
@@ -47,7 +53,13 @@ router.get("/:participantId", (req, res) => {
 });
 
 // GET Route pour rechercher tous les participants d'un établissement
-router.get("/findAllByEtablissement/:etablissementId", (req, res) => {
+router.get("/findAllByEtablissement/:etablissementId/:token", (req, res) => {
+  const token = req.params.token
+  checkToken(req.params.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
+    }
+
     Participant.find({ etablissementId: req.params.etablissementId }).then((data) => {
       if (data.length === 0) {
         res.json({
@@ -58,13 +70,18 @@ router.get("/findAllByEtablissement/:etablissementId", (req, res) => {
         res.json({ result: true, allParticipants : data  });
       }
     });
-});
+})});
 
 // PUT route pour mettre à jour un participant = à terminer
 
 
 // DELETE route pour supprimer un participant
-router.delete("/delete/:participantId", (req, res) => {
+router.delete("/delete/:participantId/:token", (req, res) => {
+  const token = req.params.token
+  checkToken(req.params.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
+    }
   Participant.deleteOne({ _id : req.params.participantId }).then((data) => {
     if (data.deletedCount > 0) {
       return res.json({ result: true, message: "Participant supprimé" });
@@ -73,6 +90,6 @@ router.delete("/delete/:participantId", (req, res) => {
     }
     
   });
-});
+})});
 
 module.exports = router;

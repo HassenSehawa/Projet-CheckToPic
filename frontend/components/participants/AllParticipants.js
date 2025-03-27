@@ -21,7 +21,7 @@ const [participantsData, setParticipantsData] = useState([]);
 //C/ Logique
 useEffect(() => {
   fetch(
-    `http://localhost:3000/participants/findAllByEtablissement/${admin.etablissement}`
+    `http://localhost:3000/participants/findAllByEtablissement/${admin.etablissement}/${admin.token}`
   )
     .then((response) => response.json())
     .then((data) => {
@@ -40,11 +40,16 @@ useEffect(() => {
 }, []);
 
 const handleDeleteGroup = (id) => {
-  fetch(`http://localhost:3000/participants/delete/${id}`, { method: "DELETE" })
+  fetch(`http://localhost:3000/participants/delete/${id}/${admin.token}`, { method: "DELETE" })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data.message);
-      setParticipantsData(participantsData.filter((e) => e.id !== id));
+      if (data.result) {
+        console.log(data.message);
+        setParticipantsData(participantsData.filter((e) => e.id !== id));
+      } else {
+        console.log(data.message)
+      }
+      
     });
 };
 

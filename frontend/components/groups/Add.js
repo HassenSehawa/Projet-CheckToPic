@@ -47,6 +47,7 @@ function Add() {
           adminId: admin.infoAdmin.id,
           etablissementId: admin.etablissement,
           participantIds: newParticipantIds,
+          token: admin.token
         }),
       }
     )

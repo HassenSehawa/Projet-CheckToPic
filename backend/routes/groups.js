@@ -3,10 +3,17 @@ var router = express.Router();
 const Group = require("../models/groups");
 const Admin = require("../models/admins");
 const { checkBody } = require("../modules/checkBody");
-// Ajout d'un nouveau groupe avec etablisement et admin en params 
+const { checkToken } = require("../modules/checkToken");
+// Ajout d'un nouveau groupe avec etablisement et admin en params
 
 router.post("/add/:adminId/:etablissementId", (req, res) => {
   const fields = ["title", "participantIds"];
+
+  checkToken(req.body.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
+    }
+  
 
   console.log("CheckBody result:", req.body);
   if (!checkBody(req.body, fields)) {
@@ -42,76 +49,97 @@ router.post("/add/:adminId/:etablissementId", (req, res) => {
       });
     }
   });
-});
+})});
 
 // Route pour rechercher tous les groups d'un établissement
-router.get("/findAllGroupsByEtablissement/:etablissementId", (req, res) => {
+router.get("/findAllGroupsByEtablissement/:etablissementId/:token", (req, res) => {
   const etablissementId = req.params.etablissementId;
-  
-  Group.find({ etablissementId }).populate("adminId", "firstName lastName").then((data) => {
-    if (data.length === 0) {
-      res.json({
-        result: false,
-        message: "Aucun groupe trouvé pour cet établissement.",
-      });
+  const token = req.params.token
+  checkToken(req.params.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
+    }
+
+
+  Group.find({ etablissementId })
+    .populate("adminId", "firstName lastName")
+    .then((data) => {
+      if (data.length === 0) {
+        res.json({
+          result: false,
+          message: "Aucun groupe trouvé pour cet établissement.",
+        });
+      } else {
+        res.json({
+          result: true,
+          allGroups: data,
+        });
+      }
+    });
+})});
+
+router.get("/findOneGroup/:groupId", (req, res) => {
+  Group.findOne({ _id: req.params.groupId })
+    .populate({ path: "participantIds", select: "firstName lastName" })
+    .then((data) => {
+      if (!data) {
+        return res.json({ result: false, message: "Aucun groupe trouvé" });
+      } else {
+        return res.json({
+          result: true,
+          group: data,
+          message: `Groupe :  ${data.title} trouvé`,
+        });
+      }
+    });
+});
+
+router.delete("/:groupId/:token", (req, res) => {
+  const token = req.params.token
+  checkToken(req.params.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
+    }
+
+  Group.deleteOne({ _id: req.params.groupId }).then((data) => {
+    if (data.deletedCount > 0) {
+      return res.json({ result: true, message: "Groupe supprimé" });
     } else {
-      res.json({
-        result: true,
-        allGroups : data,
+      return res.json({
+        result: false,
+        message: "Aucun groupe trouvé avec cet ID",
       });
     }
   });
-});
+})});
 
-router.get("/findOneGroup/:groupId", (req,res) =>{
+router.put("/modify/:groupId/:token", (req, res) => {
+  const fields = ["title", "participantIds"];
 
-  Group.findOne({_id: req.params.groupId}).populate({path: "participantIds", select: "firstName lastName"}).then((data)=> {
-  if (!data) {
-    return res.json({result: false, message: 'Aucun groupe trouvé'
-    })} else {
-      return res.json({result : true, group: data, message : `Groupe :  ${data.title} trouvé`})
+  const token = req.params.token
+  checkToken(req.params.token).then((data) => {
+    if (!data) {
+      return res.json({ result: false, message: "Token incorrect" });
     }
-  
-    
-  })
-  
-  })
-
-router.delete("/:groupId", (req, res) => {
-
-
-    Group.deleteOne({ _id : req.params.groupId }).then((data) => {
-      if (data.deletedCount > 0) {
-        return res.json({ result: true, message: "Groupe supprimé" });
-      } else {
-        return res.json({ result: false, message: "Aucun groupe trouvé avec cet ID" });
-      }
-    });
-  
-});
-
-router.put("/modify/:groupId",(req,res)=>{
-
-  const fields = ["title","participantIds" ];
-  
-
   console.log("CheckBody result:", req.body);
   if (!checkBody(req.body, fields)) {
     return res.json({ result: false, message: "Champs manquants ou vides" });
   }
 
-  Group.findOneAndUpdate({_id: req.params.groupId}, req.body,   { new: true }).then((data)=> {
+  Group.findOneAndUpdate({ _id: req.params.groupId }, req.body, {
+    new: true,
+  }).then((data) => {
     if (data) {
-      return res.json({result: true, message : "Votre groupe a été modifié", data})
+      return res.json({
+        result: true,
+        message: "Votre groupe a été modifié",
+        data,
+      });
     } else {
-      return res.json ({result: false, message : "Aucun groupe trouvé"})
+      return res.json({ result: false, message: "Aucun groupe trouvé" });
     }
-
-  })
-
-
-})
-
+  });
+})});
 
 // ADMIN Page
 
@@ -148,7 +176,6 @@ router.post("/findAllGroupsByAdminToken", (req, res) => {
   }
 });
 
-
 // DashbordPage
 
 router.get(
@@ -182,7 +209,5 @@ router.get(
       });
   }
 );
-
-
 
 module.exports = router;

@@ -25,7 +25,7 @@ function AllEvents() {
   //C/ Logique
   useEffect(() => {
     fetch(
-      `http://localhost:3000/events/findEventsByEtablissement/${etablissementId}`
+      `http://localhost:3000/events/findEventsByEtablissement`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -44,20 +44,7 @@ function AllEvents() {
       });
   }, []);
 
-  // const handleDeleteGroup = (id) => {
-  //   fetch(`http://localhost:3000/groups/${id}`, { method: "DELETE" })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log(data.message);
-  //       setGroupsData(groupsData.filter((e) => e.id !== id));
-  //     });
-  // };
-
-  // const handleToggleModal = (id) => {
-  //   setIdGroup(id);
-  //   setOpen(!open);
-  // };
-
+  
   //D. Configuration du tableau
   const columns = [
     {
@@ -153,14 +140,6 @@ function AllEvents() {
           />
         </Paper>
       )}
-      {/* {open && idEvent ? (
-        <Modify
-          open={open}
-          handleToggleModal={handleToggleModal}
-          setIdEvent={setIdEvent}
-          idGroup={idEvent}
-        />
-      ) : null} */}
     </div>
   );
 }
