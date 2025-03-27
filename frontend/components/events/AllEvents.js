@@ -12,26 +12,24 @@ import "moment/locale/fr";
 function AllEvents() {
   //A. Redux
   // Récupère l'ID de l'établissement depuis le state Redux
-  const etablissementId = useSelector(
-  (state) => state.admin.value.etablissement 
-  );
+  const admin = useSelector((state) => state.admin.value);
 
   //B. States
   const [open, setOpen] = useState(false);
   const [idEvent, setIdEvent] = useState("");
   const [eventsData, setEventsData] = useState([]);
-  console.log(eventsData)
+  console.log(eventsData);
 
   //C/ Logique
   useEffect(() => {
     fetch(
-      `http://localhost:3000/events/findEventsByEtablissement`
+      `http://localhost:3000/events/findEventsByEtablissement/${admin.etablissement}`
     )
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
           setEventsData(
-            data.data.map((e) => ({
+            data.allEvents.map((e) => ({
               id: e._id,
               eventName: e.title,
               placeName: e.place,
@@ -44,7 +42,6 @@ function AllEvents() {
       });
   }, []);
 
-  
   //D. Configuration du tableau
   const columns = [
     {
@@ -54,7 +51,8 @@ function AllEvents() {
       editable: false,
       headerAlign: "center",
       align: "center",
-    },{
+    },
+    {
       field: "placeName",
       headerName: "Lieu",
       width: 150,

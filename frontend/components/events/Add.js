@@ -1,9 +1,9 @@
 import styles from "../../styles/Events.module.css";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { buttonStyles } from "../modules/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import AddGroup from "./AddGroup";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -20,6 +20,8 @@ function AddEvent() {
   const [dateEnd, setDateEnd] = useState(null);
   const [msgCreationEvent, setMsgCreationEvent] = useState("");
   const [isCreated, setIsCreated] = useState(false);
+
+
 
   const handleChangeDateStart = (value) => {
     setDateStart(value);
@@ -111,21 +113,23 @@ function AddEvent() {
     if (!validateForm()) {
       return;
     }
-
-    fetch(`http://localhost:3000/events/add/${admin.infoAdmin.id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: form.title,
-        authorisations: [], // Un tableau non vide pour passer la validation
-        groupId: groupInEtablissement.map((group) => group.id), // Conversion de l'array d'objets en array d'IDs
-        dateStart: dateStart,
-        dateEnd: dateEnd,
-        place: form.place,
-        supportsCom: form.supportsCom,
-        etablissementId: admin.etablissement,
-      }),
-    })
+    fetch(`http://localhost:3000/groups/findOneGroup/${groupInEtablissement[0].id}`).then((response)=>response.json()).then((data)=>{
+      const participantInEvent = data.group.participantIds;
+      return fetch(`http://localhost:3000/events/add/${admin.infoAdmin.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title,
+          authorisations: participantInEvent.map((e) => ({participant : e.id, isValidated: false})), 
+          groupId: groupInEtablissement.map((group) => group.id), // Conversion de l'array d'objets en array d'IDs
+          dateStart: dateStart,
+          dateEnd: dateEnd,
+          place: form.place,
+          supportsCom: form.supportsCom,
+          etablissementId: admin.etablissement,
+        }),
+      })
+    }) 
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
@@ -144,15 +148,30 @@ function AddEvent() {
       <div className={styles.formHeader}>
         <h2>Votre évènement</h2>
         <div className={styles.formButton}>
-          <button
+          <Button
+            sx={{
+              color: "white",
+              backgroundColor: "#DC1C4D",
+              p: "7px 40px",
+              borderRadius: "50px",
+              fontWeight: "bold",
+            }}
             onClick={handleSubmitEvent}
-            className={buttonStyles({ color: "primary" })}
           >
             Créer un évènement
-          </button>
-          <button className={buttonStyles({ color: "secondary" })}>
+          </Button>
+
+          <Button
+            sx={{
+              color: "white",
+              backgroundColor: "#DC1C4D",
+              p: "7px 40px",
+              borderRadius: "50px",
+              fontWeight: "bold",
+            }}
+          >
             Générer les autorisations
-          </button>
+          </Button>
         </div>
       </div>
 

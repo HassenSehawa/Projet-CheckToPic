@@ -12,7 +12,7 @@ import "moment/locale/fr";
 function AllGroups() {
   //A. Redux
   const admin = useSelector((state) => state.admin.value);
-const monQ='monq'
+
   //B. States
   const [open, setOpen] = useState(false);
   const [idGroup, setIdGroup] = useState("");

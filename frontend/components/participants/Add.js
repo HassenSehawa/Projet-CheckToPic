@@ -1,5 +1,5 @@
 import styles from "../../styles/Participants.module.css";
-import { buttonStyles } from "../modules/Button";
+import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -94,12 +94,9 @@ function Add() {
     <div className={styles.mainContainer}>
       <div className={styles.headerContainer}>
         <h2>Compléter les informations du participant</h2>
-        <button
-          onClick={handleSubmitParticipant}
-          className={buttonStyles({ color: "secondary" })}
-        >
+        <Button sx={{color: "white", backgroundColor:"#DC1C4D", p:"7px 40px",borderRadius: "50px", fontWeight: "bold", }} onClick={handleSubmitParticipant}>
           Ajouter
-        </button>
+        </Button>
       </div>
       <span
         style={{

@@ -91,7 +91,7 @@ function AdminProfileEvents() {
         // Fonction pour transformer le tableau des pictureUrl participants en un groupe d'avatars capés à 4 (flex-end pour forcer l'alignement à gauche)
         <AvatarGroup max={4} style={{ justifyContent: "flex-end" }}>
           {params.value.map((e) => (
-            <Avatar src={e.participant.pictureUrl} />
+            <Avatar src={e.participant?.pictureUrl} />
           ))}
         </AvatarGroup>
       ),

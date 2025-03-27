@@ -1,7 +1,7 @@
 import styles from "../../styles/Groups.module.css";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { buttonStyles } from "../modules/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
@@ -62,12 +62,9 @@ function Add() {
     <div className={styles.groupContainer}>
       <div className={styles.groupHeader}>
           <h2> Compléter les informations du groupe </h2>
-        <button
-          onClick={handleSubmitGroup}
-          className={buttonStyles({ color: "secondary" })}
-        >
+        <Button sx={{color: "white", backgroundColor:"#DC1C4D", p:"7px 40px",borderRadius: "50px", fontWeight: "bold", }} onClick={handleSubmitGroup}>
           Enregistrer
-        </button>
+        </Button>
       </div>
 
       <div className={styles.groupInfos}>

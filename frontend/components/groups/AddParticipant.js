@@ -1,9 +1,9 @@
 import styles from "../../styles/Groups.module.css";
+import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { buttonStyles } from "../modules/Button";
 
 function AddParticipant({
   participantInGroup,
@@ -88,16 +88,10 @@ function AddParticipant({
         <p className={styles.errorMsg}>{errorMsg}</p>
       </div>
       <div className={styles.buttonMsgContainer}>
-        <button
-          onClick={handleSubmit}
-          className={buttonStyles({
-            color: "secondary",
-            display: "flex",
-            flexBasis: "100%",
-          })}
-        >
+
+        <Button sx={{color: "white", backgroundColor:"#DC1C4D", p:"7px 30px",borderRadius: "50px", fontWeight: "bold", }} onClick={handleSubmit}>
           Ajouter un participant
-        </button>
+        </Button>
         <span
           style={{
             color: isCreated ? "green" : "red",

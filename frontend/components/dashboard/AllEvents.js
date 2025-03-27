@@ -32,6 +32,7 @@ function AllEvents() {
   // Stockage infos events
   const [eventsData, setEventsData] = useState([]);
 
+  console.log
   // Toggle pour modal
   const [open, setOpen] = useState(false);
 
@@ -44,18 +45,17 @@ function AllEvents() {
   // Toggle pour l'icône validée ou non (dans la modal)
   const [checkIcon, setCheckIcon] = useState(false);
 
-
   const handleRowClick = (e) => {
-    setOpen(!open); // Ouverture de la modal
-
-    let allParticipants = e.row.participants.map((e) => ({
-      authId: e._id,
-      avatar: e.participant.pictureUrl,
-      firstName: e.participant.firstName,
-      lastName: e.participant.lastName,
+    setOpen(true);
+  
+    const participants = e.row.participants || [];
+  
+    const allParticipants = participants.map((e) => ({
+      firstName: e.participant?.firstName,
+      lastName: e.participant?.lastName,
       status: e.isValidated,
     }));
-
+  
     setRows(allParticipants);
   };
 
@@ -116,7 +116,7 @@ function AllEvents() {
         // Fonction pour transformer le tableau des pictureUrl participants en un groupe d'avatars capés à 4 (flex-end pour forcer l'alignement à gauche)
         <AvatarGroup max={4} style={{ justifyContent: "flex-end" }}>
           {params.value.map((e) => (
-            <Avatar src={e.participant.pictureUrl} />
+            <Avatar src={e.participant?.pictureUrl} />
           ))}
         </AvatarGroup>
       ),
